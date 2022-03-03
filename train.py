@@ -143,9 +143,9 @@ if __name__ == "__main__":
         if tracking_url_type_store != "file":
         
         
-            mlflow.sklearn.log_model(randomforest, "model", registered_model_name="SVM")
+            mlflow.sklearn.log_model(svmModel, "model", registered_model_name="SVM")
         else:
-            mlflow.sklearn.log_model(randomforest, "model")
+            mlflow.sklearn.log_model(svmModel, "model")
             
     with mlflow.start_run(run_name='Neural Network'):
         
@@ -176,6 +176,6 @@ if __name__ == "__main__":
         if tracking_url_type_store != "file":
         
         
-            mlflow.sklearn.log_model(randomforest, "model", registered_model_name="Neural Network")
+            mlflow.sklearn.log_model(NeuralNetwork, "model", registered_model_name="Neural Network")
         else:
-            mlflow.sklearn.log_model(randomforest, "model")
+            mlflow.sklearn.log_model(NeuralNetwork, "model")
