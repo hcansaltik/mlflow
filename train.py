@@ -1,27 +1,27 @@
-import os
 import warnings
-import sys
 
 import pandas as pd
 import numpy as np
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score,mean_absolute_percentage_error
+from sklearn.metrics import accuracy_score,f1_score,precision_score,recall_score
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import ElasticNet
 from urllib.parse import urlparse
 import mlflow
 import mlflow.sklearn
-
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn import svm
+from sklearn.neural_network import MLPClassifier
 import logging
 
 logging.basicConfig(level=logging.WARN)
 logger = logging.getLogger(__name__)
 
 def metrics(actual, pred):
-    rmse = np.sqrt(mean_squared_error(actual, pred))
-    mae = mean_absolute_error(actual, pred)
-    mape = mean_absolute_percentage_error(actual,pred)
-    r2 = r2_score(actual, pred)
-    return rmse, mae, mape, r2
+    accuracy = accuracy_score(actual,pred)
+    f1Score = f1_score(actual,pred)
+    precision = precision_score(actual,pred)
+    recall = recall_score(actual,pred)
+    return accuracy,f1Score,precision,recall
 
 
 if __name__ == "__main__":
@@ -48,35 +48,134 @@ if __name__ == "__main__":
     train_y = train[["Outcome"]]
     test_y = test[["Outcome"]]
 
-    alpha = float(sys.argv[1]) if len(sys.argv) > 1 else 0.5
-    l1_ratio = float(sys.argv[2]) if len(sys.argv) > 2 else 0.5
+              
+    with mlflow.start_run(run_name='CART'):
+        dtree = DecisionTreeClassifier()
+                
+        dtree.fit(train_x, train_y)
+        
+        predicted = dtree.predict(test_x)
+        
+        (accuracy,f1Score,precision,recall) = metrics(test_y, predicted)
+        
+        print("------ CART model ------")
 
-    with mlflow.start_run():
-        lr = ElasticNet(alpha=alpha, l1_ratio=l1_ratio, random_state=42)
-        lr.fit(train_x, train_y)
+        print("  Accuracy: %s" % accuracy)
+        print("  F1 Score: %s" % f1Score)
+        print("  Precision: %s" % precision)
+        print("  Recall: %s" % recall)
+        
 
-        predicted_qualities = lr.predict(test_x)
+        mlflow.log_metric("Accuracy", accuracy)
+        mlflow.log_metric("F1 Score", f1Score)
+        mlflow.log_metric("Precision", precision)
+        mlflow.log_metric("Recall", recall)
 
-        (rmse, mae, mape, r2) = metrics(test_y, predicted_qualities)
-
-        print("Elasticnet model (alpha=%f, l1_ratio=%f):" % (alpha, l1_ratio))
-        print("  RMSE: %s" % rmse)
-        print("  MAE: %s" % mae)
-        print("  MAPE: %s" % mape)
-        print("  R2: %s" % r2)
-
-        mlflow.log_param("alpha", alpha)
-        mlflow.log_param("l1_ratio", l1_ratio)
-        mlflow.log_metric("rmse", rmse)
-        mlflow.log_metric("r2", r2)
-        mlflow.log_metric("mape", mape)
-        mlflow.log_metric("mae", mae)
-
+        
         tracking_url_type_store = urlparse(mlflow.get_tracking_uri()).scheme
-
+        
         if tracking_url_type_store != "file":
-
-
-            mlflow.sklearn.log_model(lr, "model", registered_model_name="DiabetModel")
+        
+        
+            mlflow.sklearn.log_model(dtree, "model", registered_model_name="CART")
         else:
-            mlflow.sklearn.log_model(lr, "model")
+            mlflow.sklearn.log_model(dtree, "model")
+            
+    with mlflow.start_run(run_name='Random Forest'):
+        
+        randomforest = RandomForestClassifier()
+                
+        randomforest.fit(train_x, train_y)
+        
+        predicted = randomforest.predict(test_x)
+        
+        (accuracy,f1Score,precision,recall) = metrics(test_y, predicted)
+        
+        print("------ Random Forest model ------")
+
+        print("  Accuracy: %s" % accuracy)
+        print("  F1 Score: %s" % f1Score)
+        print("  Precision: %s" % precision)
+        print("  Recall: %s" % recall)
+        
+
+        mlflow.log_metric("Accuracy", accuracy)
+        mlflow.log_metric("F1 Score", f1Score)
+        mlflow.log_metric("Precision", precision)
+        mlflow.log_metric("Recall", recall)
+
+        
+        tracking_url_type_store = urlparse(mlflow.get_tracking_uri()).scheme
+        
+        if tracking_url_type_store != "file":
+        
+        
+            mlflow.sklearn.log_model(randomforest, "model", registered_model_name="RandomForest")
+        else:
+            mlflow.sklearn.log_model(randomforest, "model")
+            
+    with mlflow.start_run(run_name='SVM'):
+        
+        svmModel = svm.SVC()
+                
+        svmModel.fit(train_x, train_y)
+        
+        predicted = svmModel.predict(test_x)
+        
+        (accuracy,f1Score,precision,recall) = metrics(test_y, predicted)
+        
+        print("------ SVM ------")
+
+        print("  Accuracy: %s" % accuracy)
+        print("  F1 Score: %s" % f1Score)
+        print("  Precision: %s" % precision)
+        print("  Recall: %s" % recall)
+        
+
+        mlflow.log_metric("Accuracy", accuracy)
+        mlflow.log_metric("F1 Score", f1Score)
+        mlflow.log_metric("Precision", precision)
+        mlflow.log_metric("Recall", recall)
+
+        
+        tracking_url_type_store = urlparse(mlflow.get_tracking_uri()).scheme
+        
+        if tracking_url_type_store != "file":
+        
+        
+            mlflow.sklearn.log_model(randomforest, "model", registered_model_name="SVM")
+        else:
+            mlflow.sklearn.log_model(randomforest, "model")
+            
+    with mlflow.start_run(run_name='Neural Network'):
+        
+        NeuralNetwork = MLPClassifier()
+                
+        NeuralNetwork.fit(train_x, train_y)
+        
+        predicted = NeuralNetwork.predict(test_x)
+        
+        (accuracy,f1Score,precision,recall) = metrics(test_y, predicted)
+        
+        print("------ Neural Network ------")
+
+        print("  Accuracy: %s" % accuracy)
+        print("  F1 Score: %s" % f1Score)
+        print("  Precision: %s" % precision)
+        print("  Recall: %s" % recall)
+        
+
+        mlflow.log_metric("Accuracy", accuracy)
+        mlflow.log_metric("F1 Score", f1Score)
+        mlflow.log_metric("Precision", precision)
+        mlflow.log_metric("Recall", recall)
+
+        
+        tracking_url_type_store = urlparse(mlflow.get_tracking_uri()).scheme
+        
+        if tracking_url_type_store != "file":
+        
+        
+            mlflow.sklearn.log_model(randomforest, "model", registered_model_name="Neural Network")
+        else:
+            mlflow.sklearn.log_model(randomforest, "model")
