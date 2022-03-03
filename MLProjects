@@ -4,7 +4,4 @@ conda_env: conda.yaml
 
 entry_points:
   main:
-    parameters:
-      alpha: {type: float, default: 0.5}
-      lambda: {type: float, default: 0.5}
-    command: "python train.py {alpha} {lambda}"
+    command: "python train.py"
