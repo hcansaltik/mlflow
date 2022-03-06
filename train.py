@@ -48,6 +48,7 @@ if __name__ == "__main__":
     train_y = train[["Outcome"]]
     test_y = test[["Outcome"]]
 
+    # mlflow.start_run komutu ile modelin calistirilmasi saglanir.
               
     with mlflow.start_run(run_name='CART'):
         dtree = DecisionTreeClassifier()
@@ -65,6 +66,7 @@ if __name__ == "__main__":
         print("  Precision: %s" % precision)
         print("  Recall: %s" % recall)
         
+        # mlflow.log_metric ile metriklerin kaydedilerek mlflow'da gosterimi saglanir.
 
         mlflow.log_metric("Accuracy", accuracy)
         mlflow.log_metric("F1 Score", f1Score)
@@ -76,6 +78,7 @@ if __name__ == "__main__":
         
         if tracking_url_type_store != "file":
         
+            # mlflow.sklearn.log_model ile modellerin kayit edilmesi saglanir.
         
             mlflow.sklearn.log_model(dtree, "model", registered_model_name="CART")
         else:
