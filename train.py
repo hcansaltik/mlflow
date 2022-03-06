@@ -1,5 +1,4 @@
 import warnings
-
 import pandas as pd
 import numpy as np
 from sklearn.metrics import accuracy_score,f1_score,precision_score,recall_score
@@ -23,12 +22,10 @@ def metrics(actual, pred):
     recall = recall_score(actual,pred)
     return accuracy,f1Score,precision,recall
 
-
 if __name__ == "__main__":
     warnings.filterwarnings("ignore")
     np.random.seed(40)
 
-    # Read the wine-quality csv file from the URL
     csv_url = (
         "https://raw.githubusercontent.com/plotly/datasets/master/diabetes.csv"
     )
@@ -36,12 +33,10 @@ if __name__ == "__main__":
         data = pd.read_csv(csv_url, sep=",")
     except Exception as e:
         logger.exception(
-            "Unable to download training & test CSV, check your internet connection. Error: %s", e
+            "Veriye erisilememektedir, internet baglantinizi kontrol ediniz. Hata: %s", e
         )
 
-
     train, test = train_test_split(data)
-
 
     train_x = train.drop(["Outcome"], axis=1)
     test_x = test.drop(["Outcome"], axis=1)
@@ -51,6 +46,7 @@ if __name__ == "__main__":
     # mlflow.start_run komutu ile modelin calistirilmasi saglanir.
               
     with mlflow.start_run(run_name='CART'):
+
         dtree = DecisionTreeClassifier()
                 
         dtree.fit(train_x, train_y)
@@ -72,7 +68,6 @@ if __name__ == "__main__":
         mlflow.log_metric("F1 Score", f1Score)
         mlflow.log_metric("Precision", precision)
         mlflow.log_metric("Recall", recall)
-
         
         tracking_url_type_store = urlparse(mlflow.get_tracking_uri()).scheme
         
@@ -101,17 +96,14 @@ if __name__ == "__main__":
         print("  Precision: %s" % precision)
         print("  Recall: %s" % recall)
         
-
         mlflow.log_metric("Accuracy", accuracy)
         mlflow.log_metric("F1 Score", f1Score)
         mlflow.log_metric("Precision", precision)
         mlflow.log_metric("Recall", recall)
-
         
         tracking_url_type_store = urlparse(mlflow.get_tracking_uri()).scheme
         
         if tracking_url_type_store != "file":
-        
         
             mlflow.sklearn.log_model(randomforest, "model", registered_model_name="RandomForest")
         else:
@@ -134,17 +126,14 @@ if __name__ == "__main__":
         print("  Precision: %s" % precision)
         print("  Recall: %s" % recall)
         
-
         mlflow.log_metric("Accuracy", accuracy)
         mlflow.log_metric("F1 Score", f1Score)
         mlflow.log_metric("Precision", precision)
         mlflow.log_metric("Recall", recall)
-
         
         tracking_url_type_store = urlparse(mlflow.get_tracking_uri()).scheme
         
         if tracking_url_type_store != "file":
-        
         
             mlflow.sklearn.log_model(svmModel, "model", registered_model_name="SVM")
         else:
@@ -167,18 +156,15 @@ if __name__ == "__main__":
         print("  Precision: %s" % precision)
         print("  Recall: %s" % recall)
         
-
         mlflow.log_metric("Accuracy", accuracy)
         mlflow.log_metric("F1 Score", f1Score)
         mlflow.log_metric("Precision", precision)
         mlflow.log_metric("Recall", recall)
 
-        
         tracking_url_type_store = urlparse(mlflow.get_tracking_uri()).scheme
         
         if tracking_url_type_store != "file":
-        
-        
+                
             mlflow.sklearn.log_model(NeuralNetwork, "model", registered_model_name="Neural Network")
         else:
             mlflow.sklearn.log_model(NeuralNetwork, "model")
